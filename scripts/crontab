@@ -1,0 +1,6 @@
+#Add these lines to "crontab -e"
+
+@reboot /home/pi/Documents/jpresenter/scripts/jscheduler-autostart.sh  >> /home/pi/Documents/jpresenter/log/jscheduler-autostart.log 2>&1
+@reboot /home/pi/Documents/jpresenter/scripts/viewer-autostart.sh  >> /home/pi/Documents/jpresenter/log/viewer-autostart.log 2>&1
+0 22 * * * /home/pi/Documents/jpresenter/scripts/jscheduler-autostart.sh  >> /home/pi/Documents/jpresenter/log/jscheduler-autostart.log 2>&1
+0 22 * * * /home/pi/Documents/jpresenter/scripts/viewer-autostart.sh  >> /home/pi/Documents/jpresenter/log/viewer-autostart.log 2>&1
