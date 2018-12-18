@@ -1,7 +1,7 @@
 # JPresenter
 Displays full-screen images, for digital picture frames using Raspberry Pi.<br>
 Images are selected from directories, taking into account the Jewish holidays: Images from the Shabbat directory are displayed on Shabbat, the Pesach directory on Pesach... you get the idea.<br>
-Image changes every 30 minutes, on the half-hour.
+Images change every 30 minutes, on the half-hour.
 
 ## Overview
 ```jscheduler``` writes to the ```playlist``` file the name of the current Jewish holiday, and the day 'part': ```Evening```, ```Morning```, ```Afternoon```, and ```Motzei```.   
@@ -9,19 +9,11 @@ Image changes every 30 minutes, on the half-hour.
 
 ## Deployment
 Instructions here are specifically detailed for Raspberry Pi Raspbian.
-1. Install system image packages:
+1. Install system image packages:<br>
 ```sudo apt-get install python3-tk tk-dev libjpeg-progs libjpeg62-turbo libjpeg9-dev zlib1g-dev libfreetype6-dev```
-1. Make sure you  have Python 3.6 installed.
-If not, install from here: https://gist.github.com/dschep/24aa61672a2092246eaca2824400d37f
-1. Check that tinker is correctly installed:
-```
-python3
-import tkinter
-tkinter._test()
-``` 
-If tkinter fails, you may have to recompile Python (if it was compiled before installing the tkinter packages in step #1)
-Expected result is th
-1. Download the source files to "/home/pi/Documents"
+1. Make sure you  have Python 3.6 installed.<br>
+If not, install from[here](https://gist.github.com/dschep/24aa61672a2092246eaca2824400d37f)
+1. Download the source files to "/home/pi/Documents/jpresenter"
 1. Change to the JPresenter directory<br> ```cd /home/pi/Documents/jpresenter```
 1. Create "jpresenter" virtual environment:<br> ```python3 -m venv env```
 1. Activate "jpresenter" virtual environment:<br> ```env/bin/activate```

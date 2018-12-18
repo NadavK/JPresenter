@@ -144,30 +144,6 @@ class SlideShow():
         time_string.positionZ(0.0)
         time_string.draw()  # NB has to be drawn before quick_change() is called as buffer needs to exist
         ####################
-        week_font = pi3d.Font('fonts/arial.ttf', codepoints='0123456789 :', color=(200, 200, 200, 200), background_color=(0, 0, 0, 10), shadow=(0, 0, 0, 255), shadow_radius=3)
-        week_font.blend = True
-        target_date = datetime.date(2019, 5, 30)
-        source_date = datetime.date(2018, 8, 23)
-        week_string = pi3d.String(camera=CAMERA2D, font=week_font, is_3d=False, string='88')
-        week_string.set_shader(pi3d.Shader("uv_flat"))  # TODO: Consider different shader
-        (lt, bm, ft, rt, tp, bk) = week_string.get_bounds()
-        xpos = -(self.display.width - rt + lt) / 2.0
-        ypos = (self.display.height - tp + bm) / 2.0
-        week_string.position(xpos + 15, ypos - 15, 1.0)
-        week_string.positionZ(0.0)
-        week_string.draw()  # NB has to be drawn before quick_change() is called as buffer needs to exist
-        ####################
-        myfont_bsd = pi3d.Font('fonts/david.ttf', codepoints='בס"דX', color=(200, 200, 200, 255), background_color=(0, 0, 0, 10), shadow=(0, 0, 0, 255), shadow_radius=5)
-        myfont_bsd.blend = True
-        bsd_string = pi3d.String(camera=CAMERA2D, font=myfont_bsd, is_3d=False, string='ד"סב')
-        bsd_string.set_shader(pi3d.Shader("uv_flat"))
-        (lt, bm, ft, rt, tp, bk) = week_string.get_bounds()
-        xpos = (self.display.width - rt + lt) / 2.0
-        ypos = (self.display.height - tp + bm) / 2.0
-        bsd_string.position(xpos - 35, ypos - 15, 1.0)
-        bsd_string.positionZ(0.0)
-        bsd_string.draw()  # NB has to be drawn before quick_change() is called as buffer needs to exist
-        ####################
 
         while self.display.loop_running():
             if self.alpha < 1.0:
@@ -195,10 +171,6 @@ class SlideShow():
                 pst_now = utc_now.astimezone(pytz.timezone("Israel"))
                 time_string.quick_change(('{d.hour:>2}:{d.minute:02}'.format(d=pst_now)))
 
-                # update week text
-                # week_string.quick_change(str((target_date-datetime.date.today()).days//7+1))
-                week_string.quick_change(str((datetime.date.today() - source_date).days // 7 + 0))
-
                 # check if the slideshow file has changed
                 status = self.file_watcher.get_status()
                 if status in [FileWatch.State.ADDED, FileWatch.State.MODIFIED]:
@@ -214,8 +186,6 @@ class SlideShow():
                     self.display_new_image()
 
             time_string.draw()
-            week_string.draw()
-            bsd_string.draw()
 
 
 if __name__ == '__main__':
