@@ -4,6 +4,16 @@
 # rolling log files
 # change this to a service: "service start/restart/stop/info": https://pypi.python.org/pypi/python-daemon/ CONSIDER HOW IT IS AUTOSTARTED, maybe start it from cron?
 
+
+from apscheduler.schedulers.background import BackgroundScheduler
+import asyncio
+import datetime
+import os
+import pytz
+from subprocess import Popen
+import sys
+from tendo import singleton as tendo_singleton
+from jewish_dates import holidays, jtimes
 import logging
 
 logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
@@ -20,16 +30,6 @@ consoleHandler.setFormatter(logFormatter)
 consoleHandler.setLevel(logging.DEBUG)
 rootLogger.addHandler(consoleHandler)
 
-from apscheduler.schedulers.background import BackgroundScheduler
-import asyncio
-import datetime
-import os
-import pytz
-from subprocess import Popen
-import sys
-from tendo import singleton as tendo_singleton
-from jewish_dates import holidays, jtimes
-from tzlocal import get_localzone
 
 PLAYLIST_FILE = '/home/pi/Documents/jpresenter/playlist'
 candlelight_delta = 180  # minutes before sunset
@@ -232,7 +232,9 @@ def main(argv):
 
         loop = asyncio.get_event_loop()
 
-        scheduler = BackgroundScheduler(timezone=get_localzone(), standalone=False, job_defaults={'misfire_grace_time': 60 * 60}, )
+        # https: // stackoverflow.com / questions / 2720319 / python - figure - out - local - timezone
+        local_tz = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+        scheduler = BackgroundScheduler(timezone=local_tz, standalone=False, job_defaults={'misfire_grace_time': 60 * 60}, )
 
         # Daily reset job
         # scheduler.add_job(daily_check, 'cron', hour='3', minute='0', args=[scheduler])

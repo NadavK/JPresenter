@@ -1,9 +1,7 @@
 # NK
 
-# from jewish_dates.sun import GetSunrise, GetSunset
 import astral
 import datetime
-from tzlocal import get_localzone
 from pytz import utc
 
 # per http://www.yeshiva.co/calendar/, for Ra'anana Shabbat times, the most exact is Astral, with co-ords from Wiki, and -20 minutes
@@ -12,12 +10,6 @@ TZ = 0
 
 astral._LOCATION_INFO = """Raanana_wiki,Israel,32°11'N,34°52'E,Asia/Jerusalem,48
     Raanana_google,Israel,32°18'N,34°87'E,Asia/Jerusalem,44"""
-
-
-def astral_location(location):
-    a = astral.Astral(astral.AstralGeocoder)
-    geo = a.geocoder
-    return geo[location]
 
 
 def get_google_geo():
@@ -29,48 +21,29 @@ def get_google_geo():
     print(loc, loc.elevation)
 
 
-def next_friday(date):
-    # returns closest fri, or next fri if today is fri
-    # http://stackoverflow.com/questions/8801084/how-to-calculate-next-friday-in-python
-    friday = 4  # 0 based, starting from Monday
-    return date + datetime.timedelta(((friday - 1) - date.weekday()) % 7 + 1)
-
-
-def this_friday(date):
-    # returns closest fri, and return today if today is fri
-    # http://stackoverflow.com/questions/8801084/how-to-calculate-next-friday-in-python
-    friday = 4  # 0 based, starting from Monday
-    return date + datetime.timedelta((friday - date.weekday()) % 7)
-
-
-def sunrise_sunset_astral(location, date):
+def __sunrise_sunset_astral(location, date):
     # local False for UTC
-    astral = astral_location(location)
-    return astral.sun(local=False, date=date)
+    geo = astral.Astral(astral.AstralGeocoder).geocoder[location]
+    return geo.sun(local=False, date=date)
 
 
 def today_sunrise_sunset_astral(location):
-    return sunrise_sunset_astral(location=location, date=datetime.date.today())
+    return __sunrise_sunset_astral(location=location, date=datetime.date.today())
 
 
 def sunrise_sunset(location, date):
-    a = astral.Astral(astral.AstralGeocoder)
-    geo = a.geocoder
-    sun = sunrise_sunset_astral(location=location, date=date)
+    sun = __sunrise_sunset_astral(location=location, date=date)
 
-    sunrise_utc = sun['sunrise'].replace(tzinfo=utc)  # aastral times are utc, this is just for explicity
+    sunrise_utc = sun['sunrise'].replace(tzinfo=utc)  # astral times are utc, this is just for explicitly
     sunset_utc = sun['sunset'].replace(tzinfo=utc)
 
-    local_tz = get_localzone()
+    #https: // stackoverflow.com / questions / 2720319 / python - figure - out - local - timezone
+    local_tz = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
     # Convert time zone
     sunrise_local = sunrise_utc.astimezone(local_tz)
     sunset_local = sunset_utc.astimezone(local_tz)
 
-    return (sunrise_local, sunset_local)
-
-
-def today_sunrise_sunset(location):
-    return sunrise_sunset(location, datetime.date.today())
+    return sunrise_local, sunset_local
 
 
 def shabbat_start(location, date, candlelight_delta):
@@ -78,6 +51,12 @@ def shabbat_start(location, date, candlelight_delta):
 
 
 def shabbat_times(location, num, candlelight_delta):
+    def next_friday(date):
+        # returns closest fri, or next fri if today is fri
+        # http://stackoverflow.com/questions/8801084/how-to-calculate-next-friday-in-python
+        friday = 4  # 0 based, starting from Monday
+        return date + datetime.timedelta(((friday - 1) - date.weekday()) % 7 + 1)
+
     # returns the next <num> shabbat times
 
     # a = astral.Astral(astral.AstralGeocoder)

@@ -204,12 +204,15 @@ def get_season(g_day, g_month, g_year):
 def get_hags(date=datetime.date.today(), return_shabbat=True):
     holidays_dict = get_holidays(date.day, date.month, date.year)
 
-    if (holidays_dict):
+    if holidays_dict:
         holidays_dict.update({3: 'Hag', 4: 'Shabbat'})
     elif return_shabbat and date.weekday() == 5:  # 5 == Shabbat
         holidays_dict = {9: 'Shabbat'}  # lowest priority
 
-        # The marked code includes parashot and special shabbatot (Para, Hodesh, etc), but has a bug that 2020-05-30 does not have a parasha
+        ###############################################################################################################################################
+        #       The marked code includes parashot and special shabbatot (Para, Hodesh, etc), but has a bug that 2020-05-30 does not have a parasha    #
+        ###############################################################################################################################################
+        #
         # import date_utils.calendar_util
         # from jewish_dates.parasha import getTorahSections
         # shabbat = date #+ datetime.timedelta(days=1)
@@ -220,7 +223,7 @@ def get_hags(date=datetime.date.today(), return_shabbat=True):
         #    folders_dict.update({8: str})  # second-lowest priority
 
         # TODO: Add special shabbatot: http://individual.utoronto.ca/kalendis/hebrew/parshah.htm
-        # TODO: maybe ;ppk at this pacakge: https://pypi.org/project/convertdate/
+        # TODO: maybe ;ppk at this package: https://pypi.org/project/convertdate/
         parashot = parshios.getparsha(GregorianDate(date.year, date.month, date.day), israel=True)
         if parashot:
             for index, parash in enumerate(parashot):
