@@ -188,8 +188,8 @@ def get_holidays(g_day, g_month, g_year, diaspora=False):
     #   listHolidays.append("Shushan Purim")
 
 
-def get_season(g_day, g_month, g_year):
-    hebYear, hebMonth, hebDay = GregorianDate(g_year, g_month, g_day).to_heb().tuple()
+def get_season(date=datetime.date.today()):
+    hebYear, hebMonth, hebDay = GregorianDate(date.day, date.month, date.year).to_heb().tuple()
 
     if hebMonth >= 10:
         return {4: "Winter"}
@@ -201,7 +201,7 @@ def get_season(g_day, g_month, g_year):
         return {4: "Spring"}
 
 
-def get_hags(date=datetime.date.today(), return_shabbat=True):
+def get_hags(date=datetime.date.today(), days_range=1, return_shabbat=True):
     holidays_dict = get_holidays(date.day, date.month, date.year)
 
     if holidays_dict:
@@ -229,11 +229,17 @@ def get_hags(date=datetime.date.today(), return_shabbat=True):
             for index, parash in enumerate(parashot):
                 holidays_dict.update({8 + index / 100: PARSHIOT[parash]})  # second-lowest priority
     else:
-        holidays_dict = get_season(date.day, date.month, date.year)
+        for i in range(2, days_range*2+1):              # check if any holidays next/past x days
+            day_offset = i//2 * (1, -1)[i % 2]          # returns this order of values: +1, -1, +2, -2, +3, -3, etc...
+            offset_date = date + datetime.timedelta(days=day_offset)
+            holidays_dict = get_holidays(offset_date.day, offset_date.month, offset_date.year)
+            if holidays_dict:
+                holidays_dict.update({3: 'Hag', 4: 'Shabbat'})
+                break
 
     # export list of holidays, in order of priority
     sorted_folders = []
-    if len(holidays_dict) > 0:
+    if holidays_dict and len(holidays_dict) > 0:
         for key in sorted(holidays_dict):
             sorted_folders += [holidays_dict[key]]
 

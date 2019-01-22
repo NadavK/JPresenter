@@ -135,19 +135,15 @@ def set_hebdaily_jobs(scheduler, today=datetime.date.today(), test=False, dont_r
     today_folders = holidays.get_hags(today)
     tomorrow_folders = holidays.get_hags(tomorrow)
     yesterday_folders = holidays.get_hags(yesterday)
+    seven7days_files = holidays.get_hags(today, 3)
+
     logging.debug('Today: %s', today_folders)
     logging.debug('Tomorrow: %s', tomorrow_folders)
     logging.debug('Yesterday: %s', yesterday_folders)
-
-    seven7days_files = None
-    if now.weekday() != 5 and not today_folders:  # Shabbat (==5) and hag take precedence over nearby-holidays
-        for x in (1, -1, 2, -2, 3, -3):  # check if any holidays next/past 3 days
-            seven7days_files = holidays.get_hags(today + datetime.timedelta(days=x), return_shabbat=False)
-            if seven7days_files:
-                logging.debug('Holiday within 3 days: %s (%d days)', seven7days_files, x)
-                break
-        if not seven7days_files:
-            logging.debug('No holidays within 3 days')
+    if seven7days_files:
+        logging.debug('Holiday within 3 days: %s', seven7days_files)
+    else:
+        logging.debug('No holidays within 3 days')
 
     if tomorrow_folders and not today_folders:  # If tomorrow is hag, and not today, then start early
         next_heb_day = sunset - datetime.timedelta(minutes=candlelight_delta)  # + datetime.timedelta(days=1)
@@ -170,6 +166,8 @@ def set_hebdaily_jobs(scheduler, today=datetime.date.today(), test=False, dont_r
 
     if seven7days_files:
         today_folders = seven7days_files
+    else:
+        today_folders = holidays.get_season(today)
 
     if today_folders:
         today_folders += ['Default', ]  # always add the default folder, in case the holiday is not found e.g. tu-b'shvat
@@ -228,13 +226,13 @@ def main(argv):
 
         logging.info("Started")
 
-        print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
-
         loop = asyncio.get_event_loop()
 
-        # https: // stackoverflow.com / questions / 2720319 / python - figure - out - local - timezone
-        local_tz = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
-        scheduler = BackgroundScheduler(timezone=local_tz, standalone=False, job_defaults={'misfire_grace_time': 60 * 60}, )
+        # https://stackoverflow.com/questions/2720319/python-figure-out-local-timezone
+        local_tz_str = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo.tzname(datetime.datetime.now())
+        logging.info("TZ: " + local_tz_str)
+        scheduler = BackgroundScheduler(timezone=local_tz_str, standalone=False, job_defaults={'misfire_grace_time': 60 * 60}, )
+
 
         # Daily reset job
         # scheduler.add_job(daily_check, 'cron', hour='3', minute='0', args=[scheduler])
