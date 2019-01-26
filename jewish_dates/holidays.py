@@ -27,8 +27,8 @@ PARSHIOS_LIKE_PREVIOUS_ALGO = [
 
 
 # returns a dictionary with the name of the holiday types, with the priority as key
-def get_holidays(g_day, g_month, g_year, diaspora=False):
-    hebYear, hebMonth, hebDay = GregorianDate(g_year, g_month, g_day).to_heb().tuple()
+def get_holidays(date=datetime.date.today(), diaspora=False):
+    hebYear, hebMonth, hebDay = GregorianDate(date.year, date.month, date.day).to_heb().tuple()
 
     # Holidays in Nisan
     if hebDay == 15 and hebMonth == 1:
@@ -189,20 +189,20 @@ def get_holidays(g_day, g_month, g_year, diaspora=False):
 
 
 def get_season(date=datetime.date.today()):
-    hebYear, hebMonth, hebDay = GregorianDate(date.day, date.month, date.year).to_heb().tuple()
+    hebYear, hebMonth, hebDay = GregorianDate(date.year, date.month, date.day).to_heb().tuple()
 
     if hebMonth >= 10:
-        return {4: "Winter"}
+        return ["Winter", ]
     elif hebMonth >= 7:
-        return {4: "Fall"}
+        return ["Fall", ]
     elif hebMonth >= 4:
-        return {4: "Summer"}
+        return ["Summer", ]
     else:
-        return {4: "Spring"}
+        return ["Spring", ]
 
 
-def get_hags(date=datetime.date.today(), days_range=1, return_shabbat=True):
-    holidays_dict = get_holidays(date.day, date.month, date.year)
+def get_hags(date=datetime.date.today(), days_range=0, return_shabbat=True):
+    holidays_dict = get_holidays(date)
 
     if holidays_dict:
         holidays_dict.update({3: 'Hag', 4: 'Shabbat'})
@@ -229,10 +229,10 @@ def get_hags(date=datetime.date.today(), days_range=1, return_shabbat=True):
             for index, parash in enumerate(parashot):
                 holidays_dict.update({8 + index / 100: PARSHIOT[parash]})  # second-lowest priority
     else:
-        for i in range(2, days_range*2+1):              # check if any holidays next/past x days
+        for i in range(2, days_range*2+2):              # check if any holidays next/past x days
             day_offset = i//2 * (1, -1)[i % 2]          # returns this order of values: +1, -1, +2, -2, +3, -3, etc...
             offset_date = date + datetime.timedelta(days=day_offset)
-            holidays_dict = get_holidays(offset_date.day, offset_date.month, offset_date.year)
+            holidays_dict = get_holidays(offset_date)
             if holidays_dict:
                 holidays_dict.update({3: 'Hag', 4: 'Shabbat'})
                 break
