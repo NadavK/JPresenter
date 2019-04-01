@@ -10,8 +10,8 @@ Images change every 30 minutes, on the half-hour.
 ## Deployment
 Instructions here are specifically detailed for Raspberry Pi Raspbian.
 1. Install system image packages:<br>
-```sudo apt-get install python3-tk tk-dev libjpeg-progs libjpeg62-turbo libjpeg9-dev zlib1g-dev libfreetype6-dev```
-1. Make sure you  have Python 3.6 installed.<br>
+```sudo apt-get install python3-tk tk-dev libjpeg-progs libjpeg62-turbo libjpeg9-dev zlib1g-dev libfreetype6-dev -y```
+1. Make sure you have Python 3.6 installed.<br>
 If not, install from [here](https://gist.github.com/dschep/24aa61672a2092246eaca2824400d37f)
 1. Download the source files to "/home/pi/Documents/jpresenter"
 1. Change to the JPresenter directory<br> ```cd /home/pi/Documents/jpresenter```
