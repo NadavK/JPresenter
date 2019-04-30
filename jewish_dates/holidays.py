@@ -28,6 +28,13 @@ PARSHIOS_LIKE_PREVIOUS_ALGO = [
 
 # returns a dictionary with the name of the holiday types, with the priority as key
 def get_holidays(date=datetime.date.today(), diaspora=False):
+    holidays_dict = __get_holidays__(date)
+    if holidays_dict:
+        holidays_dict.update({3: 'Hag', 4: 'Shabbat'})
+        return holidays_dict
+
+
+def __get_holidays__(date=datetime.date.today(), diaspora=False):
     hebYear, hebMonth, hebDay = GregorianDate(date.year, date.month, date.day).to_heb().tuple()
 
     # Holidays in Nisan
@@ -201,41 +208,70 @@ def get_season(date=datetime.date.today()):
         return ["Spring", ]
 
 
+def get_personal(date=datetime.date.today()):
+    hebYear, hebMonth, hebDay = GregorianDate(date.year, date.month, date.day).to_heb().tuple()
+
+    # Holidays in Nisan
+    if hebDay == 1 and hebMonth == 1:
+        return {2: "Anniversary"}
+
+
+
+
+
+
+
+
+#TODO: this should be read from an external file
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def get_hags(date=datetime.date.today(), days_range=0, return_shabbat=True):
     holidays_dict = get_holidays(date)
 
-    if holidays_dict:
-        holidays_dict.update({3: 'Hag', 4: 'Shabbat'})
-    elif return_shabbat and date.weekday() == 5:  # 5 == Shabbat
-        holidays_dict = {9: 'Shabbat'}  # lowest priority
+    if not holidays_dict:
+        if return_shabbat and date.weekday() == 5:  # 5 == Shabbat
+            holidays_dict = {9: 'Shabbat'}  # lowest priority
 
-        ###############################################################################################################################################
-        #       The marked code includes parashot and special shabbatot (Para, Hodesh, etc), but has a bug that 2020-05-30 does not have a parasha    #
-        ###############################################################################################################################################
-        #
-        # import date_utils.calendar_util
-        # from jewish_dates.parasha import getTorahSections
-        # shabbat = date #+ datetime.timedelta(days=1)
-        # julian = date_utils.calendar_util.gregorian_to_jd(shabbat.year, shabbat.month, shabbat.day)
-        # hebYear, hebMonth, hebDay = date_utils.calendar_util.jd_to_hebrew(julian)
-        # str = getTorahSections(hebMonth, hebDay, hebYear, False)
-        # if str:
-        #    folders_dict.update({8: str})  # second-lowest priority
+            ###############################################################################################################################################
+            #       The marked code includes parashot and special shabbatot (Para, Hodesh, etc), but has a bug that 2020-05-30 does not have a parasha    #
+            ###############################################################################################################################################
+            #
+            # import date_utils.calendar_util
+            # from jewish_dates.parasha import getTorahSections
+            # shabbat = date #+ datetime.timedelta(days=1)
+            # julian = date_utils.calendar_util.gregorian_to_jd(shabbat.year, shabbat.month, shabbat.day)
+            # hebYear, hebMonth, hebDay = date_utils.calendar_util.jd_to_hebrew(julian)
+            # str = getTorahSections(hebMonth, hebDay, hebYear, False)
+            # if str:
+            #    folders_dict.update({8: str})  # second-lowest priority
 
-        # TODO: Add special shabbatot: http://individual.utoronto.ca/kalendis/hebrew/parshah.htm
-        # TODO: maybe ;ppk at this package: https://pypi.org/project/convertdate/
-        parashot = parshios.getparsha(GregorianDate(date.year, date.month, date.day), israel=True)
-        if parashot:
-            for index, parash in enumerate(parashot):
-                holidays_dict.update({8 + index / 100: PARSHIOT[parash]})  # second-lowest priority
-    else:
-        for i in range(2, days_range*2+2):              # check if any holidays next/past x days
-            day_offset = i//2 * (1, -1)[i % 2]          # returns this order of values: +1, -1, +2, -2, +3, -3, etc...
-            offset_date = date + datetime.timedelta(days=day_offset)
-            holidays_dict = get_holidays(offset_date)
-            if holidays_dict:
-                holidays_dict.update({3: 'Hag', 4: 'Shabbat'})
-                break
+            # TODO: Add special shabbatot: http://individual.utoronto.ca/kalendis/hebrew/parshah.htm
+            # TODO: maybe ;ppk at this package: https://pypi.org/project/convertdate/
+            parashot = parshios.getparsha(GregorianDate(date.year, date.month, date.day), israel=True)
+            if parashot:
+                for index, parash in enumerate(parashot):
+                    holidays_dict.update({8 + index / 100: PARSHIOT[parash]})  # second-lowest priority
+        else:
+            for i in range(1, days_range*2+2):              # check if any holidays next/past x days
+                day_offset = i//2 * (1, -1)[i % 2]          # returns this order of values: 0, +1, -1, +2, -2, +3, -3, etc...
+                offset_date = date + datetime.timedelta(days=day_offset)
+                holidays_dict = get_holidays(offset_date)
+                if not holidays_dict:
+                    holidays_dict = get_personal(offset_date)
+                if holidays_dict:
+                        break
 
     # export list of holidays, in order of priority
     sorted_folders = []
