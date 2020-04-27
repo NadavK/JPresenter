@@ -8,13 +8,13 @@ PARSHIOT = [
     'Bereshit', 'Noach', 'Lech Lecha', 'Vayera', 'Chayei Sarah',
     'Toldot', 'Vayetzei', 'Vayishlach', 'Vayeshev', 'Miketz',
     'Vayigash', 'Vayechi', 'Shemot', 'Vaera', 'Bo', 'Beshalach',
-    'Yitro', 'Mishpatim', "Teruma", 'Tetzave', 'Ki Tisa', 'Vayakhel',
-    "Pekudei", 'Vayikra', 'Tzav', "Shemini", 'Tazria', "Metzora",
+    'Yitro', 'Mishpatim', 'Teruma', 'Tetzave', 'Ki Tisa', 'Vayakhel',
+    'Pekudei', 'Vayikra', 'Tzav', 'Shemini', 'Tazria', 'Metzora',
     'Acharei Mot', 'Kedoshim', 'Emor', 'Behar', 'Bechukotai', 'Bamidbar',
-    'Naso', "Bahaalotcha", "Shelach", 'Korach', 'Chukat', 'Balak',
-    'Pinchas', 'Matot', "Masei", 'Devarim', "Vaetchanan", 'Eikev',
-    "Ree", 'Shoftim', 'Ki Tetzei', 'Ki Tavo', 'Nitzavim', 'Vayelech',
-    'Haazinu', "Vezot Habracha"
+    'Naso', 'Bahaalotcha', 'Shelach', 'Korach', 'Chukat', 'Balak',
+    'Pinchas', 'Matot', 'Masei', 'Devarim', 'Vaetchanan', 'Eikev',
+    'Ree', 'Shoftim', 'Ki Tetzei', 'Ki Tavo', 'Nitzavim', 'Vayelech',
+    'Haazinu', 'Vezot Habracha'
 ]
 
 PARSHIOS_LIKE_PREVIOUS_ALGO = [
@@ -28,192 +28,171 @@ PARSHIOS_LIKE_PREVIOUS_ALGO = [
 
 # returns a dictionary with the name of the holiday types, with the priority as key
 def get_holidays(date=datetime.date.today(), diaspora=False):
-    holidays_dict = __get_holidays__(date)
-    if holidays_dict:
-        holidays_dict.update({3: 'Hag', 4: 'Shabbat'})
-        return holidays_dict
-
-
-def __get_holidays__(date=datetime.date.today(), diaspora=False):
     hebYear, hebMonth, hebDay = GregorianDate(date.year, date.month, date.day).to_heb().tuple()
 
     # Holidays in Nisan
     if hebDay == 15 and hebMonth == 1:
-        return {0: "Pesach", 3: "Hag"}
+        return {0: 'Pesach', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 16 and hebMonth == 1:
-        return {0: "Pesach"}
+        return {0: 'Pesach', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 17 and hebMonth == 1:
-        return {0: "Pesach"}
+        return {0: 'Pesach', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 18 and hebMonth == 1:
-        return {0: "Pesach"}
+        return {0: 'Pesach', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 19 and hebMonth == 1:
-        return {0: "Pesach"}
+        return {0: 'Pesach', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 20 and hebMonth == 1:
-        return {0: "Pesach"}
+        return {0: 'Pesach', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 21 and hebMonth == 1:
-        return {0: "Pesach", 3: "Hag"}
+        return {0: 'Pesach', 3: 'Hag', 4: 'Shabbat'}
     # if hebDay == 22 and hebMonth == 1 and diaspora:
-    #    return {0: "Pesach"})
+    #    return {0: 'Pesach'})
 
     # Yom Hashoah
-    if HebrewDate(hebYear, 1, 27).weekday() == 6:
-        if hebDay == 26 and hebMonth == 1:
-            return {0: "YomHashoah"}
-    elif hebYear >= 5757 and HebrewDate(hebYear, 1, 27).weekday() == 1:
-        if hebDay == 28 and hebMonth == 1:
-            return {0: "YomHashoah"}
-    else:
-        if hebDay == 27 and hebMonth == 1:
-            return {0: "YomHashoah"}
+    if HebrewDate(hebYear, 1, 27).weekday() == 6 and hebDay == 26 and hebMonth == 1:
+        return {0: 'YomHashoah'}
+    elif hebYear >= 5757 and HebrewDate(hebYear, 1, 27).weekday() == 1 and hebDay == 28 and hebMonth == 1:
+        return {0: 'YomHashoah'}
+    elif hebDay == 27 and hebMonth == 1:
+        return {0: 'YomHashoah'}
 
     # Holidays in Iyar
 
     # Yom Hazikaron
-    if HebrewDate(hebYear, 2, 4).weekday() == 6:  # If 4th of Iyar is a Thursday ...
-        if hebDay == 2 and hebMonth == 2:  # ... then Yom Hazikaron is on 2th of Iyar
-            return {2: "YomHazikaron"}
-    elif HebrewDate(hebYear, 2, 4).weekday() == 5:
-        if hebDay == 3 and hebMonth == 2:
-            return {2: "YomHazikaron"}
-    elif hebYear >= 5764 and HebrewDate(hebYear, 2, 4).weekday() == 1:
-        if hebDay == 5 and hebMonth == 2:
-            return {2: "YomHazikaron"}
-    else:
-        if hebDay == 4 and hebMonth == 2:
-            return {2: "YomHazikaron"}
+    if HebrewDate(hebYear, 2, 4).weekday() == 6 and hebDay == 2 and hebMonth == 2:  # If 4th of Iyar is a Thursday then Yom Hazikaron is on 2th of Iyar
+        return {2: 'YomHazikaron'}
+    elif HebrewDate(hebYear, 2, 4).weekday() == 5 and hebDay == 3 and hebMonth == 2:
+        return {2: 'YomHazikaron'}
+    elif hebYear >= 5764 and HebrewDate(hebYear, 2, 4).weekday() == 1 and hebDay == 5 and hebMonth == 2:
+        return {2: 'YomHazikaron'}
+    elif hebDay == 4 and hebMonth == 2:
+        return {2: 'YomHazikaron'}
 
     # Yom Ha'Azmaut
-    if HebrewDate(hebYear, 2, 5).weekday() == 7:
-        if hebDay == 3 and hebMonth == 2:
-            return {1: "YomHaatzmaut"}
-    elif HebrewDate(hebYear, 2, 5).weekday() == 6:
-        if hebDay == 4 and hebMonth == 2:
-            return {1: "YomHaatzmaut"}
-    elif hebYear >= 5764 and HebrewDate(hebYear, 2, 4).weekday() == 1:
-        if hebDay == 6 and hebMonth == 2:
-            return {1: "YomHaatzmaut"}
-    else:
-        if hebDay == 5 and hebMonth == 2:
-            return {1: "YomHaatzmaut"}
+    if HebrewDate(hebYear, 2, 5).weekday() == 7 and hebDay == 3 and hebMonth == 2:
+        return {1: 'YomHaatzmaut', 3: 'Hag', 4: 'Shabbat'}
+    elif HebrewDate(hebYear, 2, 5).weekday() == 6 and hebDay == 4 and hebMonth == 2:
+        return {1: 'YomHaatzmaut', 3: 'Hag', 4: 'Shabbat'}
+    elif hebYear >= 5764 and HebrewDate(hebYear, 2, 4).weekday() == 1 and hebDay == 6 and hebMonth == 2:
+        return {1: 'YomHaatzmaut', 3: 'Hag', 4: 'Shabbat'}
+    elif hebDay == 5 and hebMonth == 2:
+        return {1: 'YomHaatzmaut', 3: 'Hag', 4: 'Shabbat'}
 
     if hebDay == 18 and hebMonth == 2:
-        return {0: "LagBaomer"}
+        return {0: 'LagBaomer'}
     if hebDay == 28 and hebMonth == 2:
-        return {0: "YomYerushalayim"}
+        return {0: 'YomYerushalayim'}
 
     # Holidays in Sivan
     if hebDay == 6 and hebMonth == 3:
-        return {0: "Shavuot", 3: "Hag"}
+        return {0: 'Shavuot', 3: 'Hag', 4: 'Shabbat'}
 
     # Holidays in Av
-    if HebrewDate(hebYear, 5, 9).weekday() == 7:
-        if hebDay == 10 and hebMonth == 5:
-            return {0: "TishaBAv"}
-    else:
-        if hebDay == 9 and hebMonth == 5:
-            return {0: "TishaBAv"}
-    if hebDay == 15 and hebMonth == 5:
-        return {0: "TuBAv"}
+    if HebrewDate(hebYear, 5, 9).weekday() == 7 and hebDay == 10 and hebMonth == 5:
+        return {0: 'TishaBAv'}
+    elif hebDay == 9 and hebMonth == 5:
+        return {0: 'TishaBAv'}
 
-    # Holidays in Tishri
+    if hebDay == 15 and hebMonth == 5:
+        return {0: 'TuBAv'}
+
+    # Holidays in Tishrei
     if hebDay == 1 and hebMonth == 7:
-        return {0: "RoshHashana", 1: "ShabbatShuva"}
+        return {0: 'RoshHashana', 1: 'ShabbatShuva', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 2 and hebMonth == 7:
-        return {0: "RoshHashana", 1: "ShabbatShuva"}
+        return {0: 'RoshHashana', 1: 'ShabbatShuva', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 3 and hebMonth == 7:
-        return {1: "ShabbatShuva"}
+        return {1: 'ShabbatShuva'}
     if hebDay == 4 and hebMonth == 7:
-        return {1: "ShabbatShuva"}
+        return {1: 'ShabbatShuva'}
     if hebDay == 5 and hebMonth == 7:
-        return {1: "ShabbatShuva"}
+        return {1: 'ShabbatShuva'}
     if hebDay == 6 and hebMonth == 7:
-        return {1: "ShabbatShuva"}
+        return {1: 'ShabbatShuva'}
     if hebDay == 7 and hebMonth == 7:
-        return {1: "ShabbatShuva"}
+        return {1: 'ShabbatShuva'}
     if hebDay == 8 and hebMonth == 7:
-        return {1: "ShabbatShuva"}
+        return {1: 'ShabbatShuva'}
     if hebDay == 9 and hebMonth == 7:
-        return {1: "ShabbatShuva"}
+        return {1: 'ShabbatShuva'}
     if hebDay == 10 and hebMonth == 7:
-        return {1: "YomKippur", 2: "ShabbatShuva"}
+        return {1: 'YomKippur', 2: 'ShabbatShuva', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 15 and hebMonth == 7:
-        return {1: "Sukkot", 3: "Hag"}
+        return {1: 'Sukkot', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 16 and hebMonth == 7:
-        return {1: "Sukkot"}
+        return {1: 'Sukkot', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 17 and hebMonth == 7:
-        return {1: "Sukkot"}
+        return {1: 'Sukkot', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 18 and hebMonth == 7:
-        return {1: "Sukkot"}
+        return {1: 'Sukkot', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 19 and hebMonth == 7:
-        return {1: "Sukkot"}
+        return {1: 'Sukkot', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 20 and hebMonth == 7:
-        return {1: "Sukkot"}
+        return {1: 'Sukkot', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 21 and hebMonth == 7:
-        return {1: "Sukkot"}
+        return {1: 'Sukkot', 3: 'Hag', 4: 'Shabbat'}
     if hebDay == 22 and hebMonth == 7:
-        return {1: "SimchatTorah", 3: "Hag"}
+        return {1: 'SimchatTorah', 3: 'Hag', 4: 'Shabbat'}
 
     # Holidays in Kislev
     if hebDay == 25 and hebMonth == 9:
-        return {0: "Hanukka"}
+        return {0: 'Hanukka'}
     if hebDay == 26 and hebMonth == 9:
-        return {0: "Hanukka"}
+        return {0: 'Hanukka'}
     if hebDay == 27 and hebMonth == 9:
-        return {0: "Hanukka"}
+        return {0: 'Hanukka'}
     if hebDay == 28 and hebMonth == 9:
-        return {0: "Hanukka"}
+        return {0: 'Hanukka'}
     if hebDay == 29 and hebMonth == 9:
-        return {0: "Hanukka"}
+        return {0: 'Hanukka'}
     if len(Month(hebYear, 9)) == 30:
         if hebDay == 30 and hebMonth == 9:
-            return {0: "Hanukka"}
-        if hebDay == 1 and hebMonth == 10:
-            return {0: "Hanukka"}
-        if hebDay == 2 and hebMonth == 10:
-            return {0: "Hanukka"}
+            return {0: 'Hanukka'}
+        elif hebDay == 1 and hebMonth == 10:
+            return {0: 'Hanukka'}
+        elif hebDay == 2 and hebMonth == 10:
+            return {0: 'Hanukka'}
     else:  # if len(Month(hebYear, 9)) == 29:
         if hebDay == 1 and hebMonth == 10:
-            return {0: "Hanukka"}
-        if hebDay == 2 and hebMonth == 10:
-            return {0: "Hanukka"}
-        if hebDay == 3 and hebMonth == 10:
-            return {0: "Hanukka"}
+            return {0: 'Hanukka'}
+        elif hebDay == 2 and hebMonth == 10:
+            return {0: 'Hanukka'}
+        elif hebDay == 3 and hebMonth == 10:
+            return {0: 'Hanukka'}
 
     # Holidays in Shevat
     if hebDay == 15 and hebMonth == 11:
-        return {0: "TuBShvat"}
+        return {0: 'TuBShvat'}
 
     # Holidays in Adar (I)/Adar II
     if Year(hebYear).leap:
         monthEsther = 13
     else:
         monthEsther = 12
-
     if hebDay == 14 and hebMonth == monthEsther:
-        return {0: "Purim"}
-    # if hebDay == 15 and hebMonth == monthEsther:
-    #   listHolidays.append("Shushan Purim")
+        return {0: 'Purim', 3: 'Hag', 4: 'Shabbat'}
+    elif hebDay == 15 and hebMonth == monthEsther:
+        return {0: 'Purim', 3: 'Hag', 4: 'Shabbat'}     # Shushan Purim
 
 
 def get_season(date=datetime.date.today()):
     hebYear, hebMonth, hebDay = GregorianDate(date.year, date.month, date.day).to_heb().tuple()
 
     if hebMonth >= 10:
-        return ["Winter", ]
+        return ['Winter', ]
     elif hebMonth >= 7:
-        return ["Fall", ]
+        return ['Fall', ]
     elif hebMonth >= 4:
-        return ["Summer", ]
+        return ['Summer', ]
     else:
-        return ["Spring", ]
+        return ['Spring', ]
 
 
 def get_personal(date=datetime.date.today()):
     hebYear, hebMonth, hebDay = GregorianDate(date.year, date.month, date.day).to_heb().tuple()
 
-    # Holidays in Nisan
-    if hebDay == 1 and hebMonth == 1:
-        return {2: "Anniversary"}
+    if date.month == 5 and date.day == 4:       # May the 4th be With You
+        return {3: 'StarWars'}
 
 
 
@@ -237,7 +216,7 @@ def get_personal(date=datetime.date.today()):
 
 
 
-def get_hags(date=datetime.date.today(), days_range=0, return_shabbat=True):
+def get_hags(date=datetime.date.today(), days_range_future=0, days_range_past=0, return_shabbat=True):
     holidays_dict = get_holidays(date)
 
     if not holidays_dict:
@@ -264,8 +243,10 @@ def get_hags(date=datetime.date.today(), days_range=0, return_shabbat=True):
                 for index, parash in enumerate(parashot):
                     holidays_dict.update({8 + index / 100: PARSHIOT[parash]})  # second-lowest priority
         else:
-            for i in range(1, days_range*2+2):              # check if any holidays next/past x days
+            for i in range(1, max(days_range_future, days_range_past) *2+2):              # check if any holidays next/past x days
                 day_offset = i//2 * (1, -1)[i % 2]          # returns this order of values: 0, +1, -1, +2, -2, +3, -3, etc...
+                if day_offset > days_range_future or day_offset < -days_range_past:
+                    continue
                 offset_date = date + datetime.timedelta(days=day_offset)
                 holidays_dict = get_holidays(offset_date)
                 if not holidays_dict:
