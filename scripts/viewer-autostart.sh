@@ -22,7 +22,7 @@ echo Loading Virtual Wrapper
 source env/bin/activate
 
 echo Starting Viewer
-exec /usr/local/bin/python3.6 viewer.py unique_param_for_kill_viewer > log/viewer.out
+exec python3 viewer.py unique_param_for_kill_viewer > log/viewer.out
 
 # WATCHDOG
 #modprobe bcm2708_wdog

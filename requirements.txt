@@ -1,10 +1,10 @@
 apscheduler==3.5.3
 astral==1.7.1
-#numpy==1.15.4
+#numpy==1.15.4   If not present: install apt-get python3-numpy
 pyluach==0.3.0.dev1
 #Pillow==5.3.0
 pi3d==2.28
-pytz==2018.7
+pytz==2019.3
 tendo==0.2.12
 
 #wheel==0.24.0

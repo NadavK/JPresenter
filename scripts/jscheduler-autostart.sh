@@ -15,11 +15,11 @@ scripts/kill_jscheduler.sh
 #fi
 
 echo Changing Directory
-cd /home/pi/Documents/jscheduler
+cd /home/pi/Documents/jpresenter
 pwd
 
 echo Loading Virtual Wrapper
 source env/bin/activate
 
 echo Starting JScheduler
-/usr/local/bin/python3.6 jscheduler.py unique_param_for_kill_jscheduler > log/jscheduler.out
+python3 jscheduler.py unique_param_for_kill_jscheduler > log/jscheduler.out
