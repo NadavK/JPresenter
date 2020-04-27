@@ -51,6 +51,10 @@ class PlayerData:
         return s
 
 
+# Global
+data = PlayerData(day_part='None', folders=[])
+
+
 # Returns the first existing folder, and adds the suffix-folder if it also exists
 def find_existing_folders(base_folder, folders, suffix):
     logging.info('find_existing_folders(). base_folder: %s, folders: %s, suffix: %s', base_folder, folders, suffix)
@@ -74,7 +78,7 @@ def write_playlist_file(folders, path=None):
             f.write(folder + "\n")
 
 
-def set_tv_source(data):
+def set_tv_source():
     def send_cec_command(cec):
         # on and set source to Pi  (where the command is sent from):
         # echo 'as'|cec-client -s
@@ -88,8 +92,13 @@ def set_tv_source(data):
         logging.info('CEC command: %s', cmd)
         Popen(cmd, shell=True)
 
-    now = datetime.datetime.now(pytz.utc)
-    if now.hour > 21 or now.hour < 2:  # time is in UTC - so off times are between 22:00 (midnight/1:00) and 2:00 (4:00/5:00) - actual off time depends on cron job, and on time depends on 'sunrise'
+    #now = datetime.datetime.now(pytz.utc)
+    now = datetime.datetime.now(pytz.timezone('Asia/Jerusalem'))
+    if 'Pesach' in data.folders and 2 <= now.hour < 7:
+        send_cec_command('standby 0')
+    elif 'Shabbat' in data.folders and now.hour < 7:
+        send_cec_command('standby 0')
+    elif now.hour < 6:                          # turn off everyday between 24:00 - 06:00
         send_cec_command('standby 0')
     elif 'Shabbat' in data.folders:
         send_cec_command('as')  # Set TV source to this machine (in case TV is displaying another source)
@@ -105,10 +114,10 @@ def set_tv_source(data):
     #    send_cec_command('on 0')
 
 
-def play_presentation(scheduler, data, just_test=False):
+def play_presentation(just_test=False):
     logging.info('Presentation data: %s', str(data))
 
-    set_tv_source(data)
+    set_tv_source()
 
     folders = find_existing_folders(presentation_base_path, data.folders, data.day_part)
     if folders:
@@ -126,6 +135,8 @@ def midpoint(t1, t2):
 
 
 def set_hebdaily_jobs(scheduler, today=datetime.date.today(), test=False, dont_rerun=False):
+    global data
+
     sunrise, sunset = jtimes.sunrise_sunset(location, today)
     logging.debug('today suntimes: %s, %s', sunrise, sunset)
 
@@ -135,7 +146,7 @@ def set_hebdaily_jobs(scheduler, today=datetime.date.today(), test=False, dont_r
     today_folders = holidays.get_hags(today)
     tomorrow_folders = holidays.get_hags(tomorrow)
     yesterday_folders = holidays.get_hags(yesterday)
-    seven7days_files = holidays.get_hags(today, 3)
+    seven7days_files = holidays.get_hags(today, 3, 0)
 
     logging.debug('Today: %s', today_folders)
     logging.debug('Tomorrow: %s', tomorrow_folders)
@@ -174,18 +185,18 @@ def set_hebdaily_jobs(scheduler, today=datetime.date.today(), test=False, dont_r
 
         # Erev
         data = PlayerData(day_part='Erev', folders=today_folders)
-        play_presentation(scheduler, data, test)  # Play now
+        play_presentation(test)  # Play now
 
         # Morning
         start_time = sunrise
         data = PlayerData(day_part='Morning', folders=today_folders)
-        if scheduler: scheduler.add_job(play_presentation, 'date', run_date=start_time, args=[scheduler, data])
+        if scheduler: scheduler.add_job(play_presentation, 'date', run_date=start_time)
         logging.debug('Morning: %s', start_time)
 
         # Afternoon
         start_time = midpoint(sunset, sunrise)
         data = PlayerData(day_part='Afternoon', folders=today_folders)
-        if scheduler: scheduler.add_job(play_presentation, 'date', run_date=start_time, args=[scheduler, data])
+        if scheduler: scheduler.add_job(play_presentation, 'date', run_date=start_time)
         logging.debug('Afternoon: %s', start_time)
     else:
         folders = ['Default', ]
@@ -193,19 +204,19 @@ def set_hebdaily_jobs(scheduler, today=datetime.date.today(), test=False, dont_r
             data = PlayerData(day_part='Motzei', folders=yesterday_folders)
         else:  # Regular day
             data = PlayerData(day_part='Evening', folders=folders)
-        play_presentation(scheduler, data, test)  # Play now
+        play_presentation(test)  # Play now
         logging.debug('Now: %s', data.folders)
 
         # Morning
         start_time = sunrise
         data = PlayerData(day_part='Morning', folders=folders)
-        if scheduler: scheduler.add_job(play_presentation, 'date', run_date=start_time, args=[scheduler, data])
+        if scheduler: scheduler.add_job(play_presentation, 'date', run_date=start_time)
         logging.debug('Morning: %s', start_time)
 
         # Afternoon
         start_time = midpoint(sunset, sunrise)
         data = PlayerData(day_part='Afternoon', folders=today_folders)
-        if scheduler: scheduler.add_job(play_presentation, 'date', run_date=start_time, args=[scheduler, data])
+        if scheduler: scheduler.add_job(play_presentation, 'date', run_date=start_time)
         logging.debug('Afternoon: %s', start_time)
 
     if scheduler:
@@ -231,7 +242,10 @@ def main(argv):
         # https://stackoverflow.com/questions/2720319/python-figure-out-local-timezone
         local_tz_str = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo.tzname(datetime.datetime.now())
         logging.info("TZ: " + local_tz_str)
-        scheduler = BackgroundScheduler(timezone=local_tz_str, standalone=False, job_defaults={'misfire_grace_time': 60 * 60}, )
+        #scheduler = BackgroundScheduler(timezone=local_tz_str, standalone=False, job_defaults={'misfire_grace_time': 60 * 60}, )
+        scheduler = BackgroundScheduler(timezone=None, standalone=False, job_defaults={'misfire_grace_time': 60 * 60}, )
+        scheduler.add_job(set_tv_source, 'cron', minute=0)      # Turn the TV on/off, and set the TV source
+        scheduler.add_job(set_tv_source, 'cron', minute=30)     # Turn the TV on/off, and set the TV source
 
 
         # Daily reset job
