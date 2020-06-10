@@ -157,11 +157,12 @@ def set_hebdaily_jobs(scheduler, today=datetime.date.today(), test=False, dont_r
         logging.debug('No holidays within 3 days')
 
     if tomorrow_folders and not today_folders:  # If tomorrow is hag, and not today, then start early
-        next_heb_day = sunset - datetime.timedelta(minutes=candlelight_delta)  # + datetime.timedelta(days=1)
-    elif not today_folders and yesterday_folders:  # now is Motzei hag, so extend by an hour
-        next_heb_day = sunset + datetime.timedelta(minutes=60)
+        next_heb_day = sunset - datetime.timedelta(minutes=candlelight_delta)
+    elif today_folders and not tomorrow_folders:  # now is Motzei hag, so extend by an 1 hour and 15 minutes
+        next_heb_day = sunset + datetime.timedelta(minutes=75)
     else:  # nothing, or second-day hag
-        next_heb_day = sunset  # + datetime.timedelta(days=1)
+        next_heb_day = sunset
+
     logging.debug('next_heb_day: %s', next_heb_day)
     logging.debug('now: %s', now)
 
